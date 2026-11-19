@@ -60,5 +60,10 @@ if errorlevel 1 (
 
 echo.
 echo Starting Viral Clipper on http://127.0.0.1:8000
-echo Open that address in your browser. Press Ctrl+C here to stop.
+echo Your browser will open automatically. Keep this window open while you work.
+echo Press Ctrl+C here (or close this window) to stop the app.
+
+REM Open the browser a moment after the server starts (in the background).
+start "" /b cmd /c "timeout /t 3 >nul & start http://127.0.0.1:8000"
+
 python -m app.main
