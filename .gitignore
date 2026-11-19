@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# App working data (downloads, uploads, library, rendered clips)
+data/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log

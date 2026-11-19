@@ -1,0 +1,9 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+yt-dlp>=2024.11.4
+faster-whisper==1.0.3
+numpy>=1.24
+pydantic>=2.5
+python-multipart>=0.0.9
+# Optional: only needed for Commentary mode with the OpenAI TTS provider.
+openai>=1.40.0

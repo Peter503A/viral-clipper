@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viral Clipper</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">✂️</span>
+      <h1>Viral Clipper</h1>
+    </div>
+    <p class="tag">Two ways to make viral vertical reels &mdash; no watermark.</p>
+
+    <nav class="modes">
+      <button class="mode-btn active" data-mode="clip">
+        🎬 AI Clipping <small>Auto-clip from a URL</small>
+      </button>
+      <button class="mode-btn" data-mode="commentary">
+        🎙️ Commentary <small>Voiceover over gameplay</small>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ CLIP MODE ============ -->
+    <section class="card mode-panel" id="form-card" data-mode="clip">
+      <div class="field">
+        <label for="url">Video URL (YouTube / stream VOD)</label>
+        <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=..." />
+      </div>
+
+      <div class="or-row">
+        <span>or</span>
+        <label class="upload-btn">
+          ⬆ Upload a video file
+          <input id="clip-file" type="file" accept="video/*" hidden />
+        </label>
+        <span id="clip-file-name" class="file-name"></span>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="num">Number of clips</label>
+          <input id="num" type="number" value="10" min="1" max="30" />
+        </div>
+        <div class="field">
+          <label for="min">Min length (s)</label>
+          <input id="min" type="number" value="15" min="5" max="120" />
+        </div>
+        <div class="field">
+          <label for="max">Max length (s)</label>
+          <input id="max" type="number" value="60" min="10" max="180" />
+        </div>
+      </div>
+
+      <details class="advanced" open>
+        <summary>Layout &amp; cam region</summary>
+
+        <div class="layout-editor">
+          <div class="preview">
+            <div class="phone">
+              <div class="band cam-band" id="cam-band">
+                <span>CAM (streamer)</span>
+              </div>
+              <div class="subtitle-demo">*SUBTITLES*</div>
+              <div class="band game-band">
+                <span>GAMEPLAY</span>
+              </div>
+            </div>
+            <p class="hint">Output is 1080&times;1920 (9:16). The cam sits on top, gameplay below.</p>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label>Cam height: <span id="cam-h-val">40</span>% of screen</label>
+              <input id="cam-h" type="range" min="10" max="90" value="40" />
+            </div>
+
+            <fieldset>
+              <legend>Cam crop (from source video)</legend>
+              <div class="grid2">
+                <label>X <input id="cam-x" type="number" value="0" min="0" max="100" step="1" />%</label>
+                <label>Y <input id="cam-y" type="number" value="0" min="0" max="100" step="1" />%</label>
+                <label>W <input id="cam-w" type="number" value="100" min="1" max="100" step="1" />%</label>
+                <label>H <input id="cam-h2" type="number" value="50" min="1" max="100" step="1" />%</label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Gameplay crop (from source video)</legend>
+              <div class="grid2">
+                <label>X <input id="game-x" type="number" value="0" min="0" max="100" step="1" />%</label>
+                <label>Y <input id="game-y" type="number" value="50" min="0" max="100" step="1" />%</label>
+                <label>W <input id="game-w" type="number" value="100" min="1" max="100" step="1" />%</label>
+                <label>H <input id="game-h" type="number" value="50" min="1" max="100" step="1" />%</label>
+              </div>
+            </fieldset>
+
+            <div class="toggles">
+              <label><input id="subs" type="checkbox" checked /> English subtitles</label>
+              <label><input id="trim" type="checkbox" checked /> Trim dead air / "ähm"</label>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="advanced" open>
+        <summary>Recipe &mdash; subtitles, hook &amp; look</summary>
+
+        <div class="field" style="margin-top:12px">
+          <label>Subtitle style</label>
+          <div class="style-picker" id="style-picker">
+            <button type="button" class="style-opt active" data-style="karaoke">
+              <span class="demo">TO <b class="hl-y">GET</b> STARTED</span>
+              <small>Karaoke</small>
+            </button>
+            <button type="button" class="style-opt" data-style="word_cut">
+              <span class="demo"><b class="hl-y">STARTED</b></span>
+              <small>Word Cut</small>
+            </button>
+            <button type="button" class="style-opt" data-style="highlight">
+              <span class="demo">TO GET <b class="box">STARTED</b></span>
+              <small>Highlight</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="toggles" style="margin-top:14px">
+          <label><input id="hook" type="checkbox" /> Auto-Hook (headline)</label>
+          <label><input id="color" type="checkbox" /> Color correction</label>
+        </div>
+        <div class="field" id="hook-text-row" style="display:none; margin-top:10px">
+          <label for="hook-text">Hook text (leave empty to auto-generate)</label>
+          <input id="hook-text" type="text" placeholder="e.g. YOU WON'T BELIEVE THIS" />
+        </div>
+      </details>
+
+      <button id="start" class="primary">Analyze &amp; Clip</button>
+      <p class="note">Tip: the cam crop is the box in the <em>original</em> video where the webcam sits. Set it once for a given streamer.</p>
+    </section>
+
+    <!-- ============ COMMENTARY MODE ============ -->
+    <section class="card mode-panel hidden" id="commentary-card" data-mode="commentary">
+      <div class="lib-header">
+        <h2>Gameplay library</h2>
+        <label class="upload-btn">
+          + Add gameplay video
+          <input id="lib-file" type="file" accept="video/*" hidden />
+        </label>
+      </div>
+      <p class="note">Upload GTA 6 (or any) gameplay. One is picked at random as the background &mdash; or choose a specific one below.</p>
+      <div id="library" class="library"></div>
+
+      <div class="field" style="margin-top:18px">
+        <label for="bg-select">Background video</label>
+        <select id="bg-select">
+          <option value="">🎲 Random from library</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="script">Script (facts, bugs, viral takes — this gets read aloud)</label>
+        <textarea id="script" rows="7" placeholder="Did you know GTA 6 has a **secret** island? One early build had a *huge* bug where cars would fly 300 feet into the air..."></textarea>
+        <p class="hint" style="text-align:left">
+          Captions appear <strong>word-by-word in real time</strong> as the voice speaks.
+          Wrap a word in <code>*stars*</code> to make it <span class="hl-y">yellow</span>,
+          or <code>**double stars**</code> to make it <span class="hl-r">red</span>.
+          Numbers &amp; punchy words are auto-highlighted.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="voice">Voice (optional override)</label>
+          <input id="voice" type="text" placeholder="e.g. onyx / nova / shimmer" />
+        </div>
+        <div class="field">
+          <label>Subtitle position: <span id="sub-pos-val">50</span>% from top</label>
+          <input id="sub-pos" type="range" min="10" max="90" value="50" />
+        </div>
+        <div class="field">
+          <label style="margin-top:28px"><input id="c-subs" type="checkbox" checked /> Subtitles</label>
+        </div>
+      </div>
+
+      <button id="start-commentary" class="primary">Generate Commentary Reel</button>
+      <p class="note">Voice uses your configured TTS provider (OpenAI by default). See the README for API keys or the free local Piper option.</p>
+    </section>
+
+    <section class="card hidden" id="progress-card">
+      <h2 id="status-title">Working…</h2>
+      <div class="bar"><div id="bar-fill"></div></div>
+      <p id="status-msg" class="status-msg"></p>
+    </section>
+
+    <section class="card hidden" id="results-card">
+      <h2>Clips <span id="clip-count"></span></h2>
+      <div id="clips" class="clips"></div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
