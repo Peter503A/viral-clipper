@@ -12,9 +12,21 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM --- Find a Python launcher: prefer "py", fall back to "python" ---
+REM --- Find a Python launcher ---
+REM Prefer Python 3.12 (all packages have prebuilt wheels for it). Very new
+REM versions like 3.13+/3.15 often lack wheels and try to compile from source,
+REM which needs a C++ toolchain and fails. We pin 3.12 when available.
 set "PYEXE="
-where py >nul 2>nul && set "PYEXE=py"
+py -3.12 --version >nul 2>nul && set "PYEXE=py -3.12"
+if not defined PYEXE (
+  py -3.11 --version >nul 2>nul && set "PYEXE=py -3.11"
+)
+if not defined PYEXE (
+  py -3.10 --version >nul 2>nul && set "PYEXE=py -3.10"
+)
+if not defined PYEXE (
+  where py >nul 2>nul && set "PYEXE=py"
+)
 if not defined PYEXE (
   where python >nul 2>nul && set "PYEXE=python"
 )
