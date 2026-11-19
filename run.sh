@@ -21,11 +21,12 @@ fi
 # shellcheck disable=SC1091
 source .venv/bin/activate
 
-# 3) Dependencies
-echo "Installing Python dependencies…"
-pip install --quiet --upgrade pip
-pip install --quiet -r requirements.txt
+# 3) Dependencies (stop on failure instead of launching a broken server)
+echo "Installing Python dependencies (first run can take a few minutes)…"
+pip install --upgrade pip
+pip install -r requirements.txt
 
 # 4) Run
 echo "Starting Viral Clipper on http://127.0.0.1:8000"
+echo "Open that address in your browser. Press Ctrl+C here to stop."
 python -m app.main

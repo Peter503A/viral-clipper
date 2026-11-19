@@ -40,10 +40,11 @@ class Cue:
 
 @lru_cache(maxsize=1)
 def _load_model():
-    from faster_whisper import WhisperModel
+    import whisper  # openai-whisper
 
-    # int8 keeps it light on CPU; auto-detects GPU if available via "cuda".
-    return WhisperModel(config.WHISPER_MODEL, device="auto", compute_type="int8")
+    # Loads (and on first run downloads) the chosen model. Runs on CPU; uses
+    # GPU automatically if a CUDA build of torch is installed.
+    return whisper.load_model(config.WHISPER_MODEL)
 
 
 def transcribe_clip(path: str, max_words_per_cue: int = 4) -> list[Cue]:
@@ -70,13 +71,13 @@ def transcribe_file(
     except Exception as exc:  # noqa: BLE001
         raise RuntimeError(f"Could not load Whisper model: {exc}") from exc
 
-    segments, _info = model.transcribe(
+    result = model.transcribe(
         path,
         task="translate" if translate else "transcribe",
-        vad_filter=True,
         word_timestamps=True,
-        beam_size=1,
+        fp16=False,  # CPU-safe; avoids a warning on machines without a GPU
     )
+    segments = result.get("segments", [])
 
     cues: list[Cue] = []
     word_buffer: list[Word] = []
@@ -94,21 +95,30 @@ def transcribe_file(
         word_buffer.clear()
 
     for seg in segments:
-        words = getattr(seg, "words", None)
+        words = seg.get("words") or []
         if not words:
             # No word timings: fall back to the whole segment as one cue.
-            txt = seg.text.strip()
+            txt = (seg.get("text") or "").strip()
             if txt:
-                cues.append(Cue(start=seg.start, end=seg.end, text=txt.upper()))
+                cues.append(
+                    Cue(
+                        start=float(seg.get("start", 0.0)),
+                        end=float(seg.get("end", 0.0)),
+                        text=txt.upper(),
+                    )
+                )
             continue
         for w in words:
-            if w.word is None or w.start is None or w.end is None:
+            raw = w.get("word")
+            start = w.get("start")
+            end = w.get("end")
+            if raw is None or start is None or end is None:
                 continue
-            token = w.word.strip().upper()
+            token = raw.strip().upper()
             if not token:
                 continue
             word_buffer.append(
-                Word(text=token, start=float(w.start), end=float(w.end))
+                Word(text=token, start=float(start), end=float(end))
             )
             if len(word_buffer) >= max_words_per_cue:
                 flush()
